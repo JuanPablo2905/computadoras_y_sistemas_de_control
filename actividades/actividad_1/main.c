@@ -11,27 +11,31 @@
 #define ANALOG_CH   0
 
 // Tiempo de refresco para el siete segmentos
-#define SLEEP_MS 10
+#define SLEEP_MS 200
 // Tiempo entre conversiones
-#define ADC_DELAY_MS  500
-
+#define ADC_DELAY_MS  50
+#define ADC_READING
 // Variable para almacenar el resultado del ADC
-uint16_t adc_value = 0;
+uint16_t adc_value = 4095;
 // Variable para guardar el valor de temperatura
 float temperatura = 0.0;
 // Constante de temperatura para el termistor
 const uint16_t beta = 3950;
-
+//Float conversiones
+float conversiones = 0;
 /*
  * @brief Callback para la interrupcion de timer
  * @param t: puntero a repeating_timer
  */
 bool muestreo_periodico(struct repeating_timer *t) {
   // Lectura analogica (variable adc_value)
-
+  adc_value= adc_read(); 
   // Calcular valor de temperatura (variable temperatura)
-
+  float voltaje= (adc_value*3.3)/4095;
+  float RNTC= (3300*voltaje)/(3.3-voltaje);
+  float temperatura= ((beta*298)/(298 * log(RNTC/2200)+beta))
 }
+
 
 /*
  * @brief Display temperature value in 7 segment display
@@ -41,11 +45,8 @@ void display_temp(float temperatura) {
   // Variable para armar el string
   char str[16];
   // Armo string con temperatura
-  sprintf(str, "Temp=%.2f C", temperatura);
-  // Limpio display
-  lcd_clear();
-  // Muestro
-  lcd_string(str);
+  sprintf(str, "Temp=%.2f C\n", temperatura);
+  printf(str);
 }
 
 /*
